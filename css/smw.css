@@ -1,0 +1,56 @@
+#smw-chat-overlay {
+  position: absolute;
+  bottom: 5%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 80%;
+  max-height: 80%;
+  padding: 5px;
+  border-radius: 5px;
+  background-color: rgba(0, 0, 0, 0.9);
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 1.2em;
+  z-index: var(--z-index-window);
+  display: none;
+}
+
+#smw-chat-overlay .smw-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0px;
+}
+
+#smw-chat-overlay .smw-header {
+  padding: 5px;
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: bold;
+}
+
+#smw-chat-overlay .smw-message {
+  padding: 15px;
+  padding-top: 5px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  word-wrap: break-word;
+  width: 100%;
+  box-sizing: border-box;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+#smw-chat-overlay .smw-content .smw-control {
+  float: right;
+}
+
+#smw-chat-overlay .smw-content .smw-button {
+  margin-left: 20px;
+  color: rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+#smw-chat-overlay .smw-content .smw-button:hover {
+  color: rgba(255, 255, 255, 1);
+  transform: scale(1.5);
+  filter: drop-shadow(0px 0px 10px rgba(255, 255, 255, 0.9));
+}

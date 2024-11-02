@@ -1,0 +1,36 @@
+{
+    "name": "simple-message-window",
+    "title": "Simple Message Window",
+    "description": "Simple Message Window",
+    "authors": [
+      {
+        "name": "Jean.N"
+      }
+    ],
+    "url": "https://github.com/jeannjeann/simplemessagewindow-fvtt",
+    "readme": "README.md",
+    "version": "1.0.0",
+    "compatibility": {
+      "minimum": "11",
+      "verified": "11.315",
+      "maximum": "12"
+    },
+    "esmodules": ["module/smw.mjs"],
+    "styles": ["css/smw.css"],
+    "languages": [
+        {
+          "lang": "en",
+          "name": "English",
+          "path": "lang/en.json"
+        },
+        {
+          "lang": "ja",
+          "name": "日本語(Japanese)",
+          "path": "lang/ja.json"
+        }
+      ],
+        "socket": false,
+    "manifest": "https://github.com/jeannjeann/simplemessagewindow-fvtt/releases/download/1.0.0/module.json",
+    "download": "https://github.com/jeannjeann/simplemessagewindow-fvtt/releases/download/1.0.0/module.zip"
+}
+  
