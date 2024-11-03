@@ -104,6 +104,14 @@ Hooks.once("init", () => {
     type: Boolean,
     default: true,
   });
+  game.settings.register("simple-message-window", "hideMysteryman", {
+    name: game.i18n.localize("SETTING.hideMysteryman.name"),
+    hint: game.i18n.localize("SETTING.hideMysteryman.hint"),
+    scope: "world",
+    config: true,
+    type: Boolean,
+    default: true,
+  });
   game.settings.register("simple-message-window", "imgSize", {
     name: game.i18n.localize("SETTING.imgSize.name"),
     hint: game.i18n.localize("SETTING.imgSize.hint"),
@@ -294,15 +302,24 @@ async function showMessage() {
   );
 
   chatOverlay.innerHTML = window;
+
+  // set image
+  let hideMysteryman =
+    game.settings.get("simple-message-window", "hideMysteryman") ?? 100;
+  let image = "";
   if (characterImg) {
-    portraitOverlay.querySelector("img").src = characterImg;
+    image = characterImg;
   } else {
-    portraitOverlay.querySelector("img").src = playerImg;
+    image = playerImg;
   }
+  if (hideMysteryman) {
+    if (image == "icons/svg/mystery-man.svg") image = "";
+  }
+  portraitOverlay.querySelector("img").src = image;
 
   chatOverlay.style.display = "block";
   let showImg = game.settings.get("simple-message-window", "showImg");
-  if (showImg) {
+  if (showImg && image != "") {
     portraitOverlay.style.display = "block";
   } else {
     portraitOverlay.style.display = "none";

@@ -1,51 +1,55 @@
 {
-  "SETTING": {
-      "smwEnable":{
-          "name": "Display message window"
-      },
-      "showCharacter":{
-          "name": "Character Messages",
-          "hint": "Show character message in window (default: on)"
-      },
-      "showGM":{
-          "name": "Gamemaster Messages",
-          "hint": "Show gamemaster message in window (default: on)"
-      },
-      "showPlayer":{
-          "name": "Player Messages",
-          "hint": "Show player message in window (default: on)"
-      },
-      "showRoll":{
-          "name": "Dice roll Messages",
-          "hint": "Show dice roll message in window (default: on)"
-      },
-      "fontSize":{
-          "name": "Font size (%)",
-          "hint": "Message window font size as a percentage (default: 100)"
-      },
-      "textSpeed":{
-          "name": "Text speed (%)",
-          "hint": "Text speed as a percentage (default: 100)"
-      },
-      "windowPosition":{
-          "name": "Virtical position",
-          "hint": "Message window virtical position (0: bottom, 100: top, default: 5)"
-      },
-      "windowWidth":{
-          "name": "Window width (%)",
-          "hint": "Message window width as a percentage (default: 100)"
-      },
-      "windowHeight":{
-          "name": "Window height (%)",
-          "hint": "Message window height as a percentage (default: 100)"
-      },
-      "showImg":{
-          "name": "Show Image",
-          "hint": "Display Image (default: on)"
-      },
-      "imgSize":{
-          "name": "Image size (%)",
-          "hint": "Image size as a percentage (default: 100)"
-      }
-  }
+    "SETTING": {
+        "smwEnable":{
+            "name": "Display message window"
+        },
+        "showCharacter":{
+            "name": "Character Messages",
+            "hint": "Show character message in window (default: on)"
+        },
+        "showGM":{
+            "name": "Gamemaster Messages",
+            "hint": "Show gamemaster message in window (default: on)"
+        },
+        "showPlayer":{
+            "name": "Player Messages",
+            "hint": "Show player message in window (default: on)"
+        },
+        "showRoll":{
+            "name": "Dice roll Messages",
+            "hint": "Show dice roll message in window (default: on)"
+        },
+        "fontSize":{
+            "name": "Font size (%)",
+            "hint": "Message window font size as a percentage (default: 100)"
+        },
+        "textSpeed":{
+            "name": "Text speed (%)",
+            "hint": "Text speed as a percentage (default: 100)"
+        },
+        "windowPosition":{
+            "name": "Virtical position",
+            "hint": "Message window virtical position (0: bottom, 100: top, default: 5)"
+        },
+        "windowWidth":{
+            "name": "Window width (%)",
+            "hint": "Message window width as a percentage (default: 100)"
+        },
+        "windowHeight":{
+            "name": "Window height (%)",
+            "hint": "Message window height as a percentage (default: 100)"
+        },
+        "showImg":{
+            "name": "Show Image",
+            "hint": "Display Image (default: on)"
+        },
+        "hideMysteryman":{
+            "name": "Hide Default Image",
+            "hint": "Hide default image (icons/svg/mystery-man.svg, default: on)"
+        },
+        "imgSize":{
+            "name": "Image size (%)",
+            "hint": "Image size as a percentage (default: 100)"
+        }
+    }
 }

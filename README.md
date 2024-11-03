@@ -17,5 +17,8 @@ Please specify the letters "ManifestURL" in Mod Extensions, Module Installation,
 
 # CHANGELOG
 
+## 1.0.1
+- add hide default image (mystery-man.svg) option
+
 ## 1.0.0
 - first release
