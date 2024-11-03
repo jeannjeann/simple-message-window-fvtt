@@ -6,6 +6,7 @@ let isTyping = false;
 let messageQueue = [];
 
 Hooks.once("init", () => {
+  //prepare overlay
   const chatOverlay = document.createElement("div");
   chatOverlay.id = "smw-chat-overlay";
   document.body.appendChild(chatOverlay);
@@ -14,10 +15,77 @@ Hooks.once("init", () => {
   portraitOverlay.id = "smw-portrait-overlay";
   portraitOverlay.innerHTML = `<img src="" alt="Image">`;
   document.body.appendChild(portraitOverlay);
+
+  // Prepare module settings.
+  game.settings.register("simple-message-window", "smwEnable", {
+    name: game.i18n.localize("SETTING.smwEnable.name"),
+    scope: "client",
+    config: false,
+    type: Boolean,
+    default: true,
+  });
+  game.settings.register("simple-message-window", "showCharacter", {
+    name: game.i18n.localize("SETTING.showCharacter.name"),
+    hint: game.i18n.localize("SETTING.showCharacter.hint"),
+    scope: "world",
+    config: true,
+    type: Boolean,
+    default: true,
+  });
+  game.settings.register("simple-message-window", "showGM", {
+    name: game.i18n.localize("SETTING.showGM.name"),
+    hint: game.i18n.localize("SETTING.showGM.hint"),
+    scope: "world",
+    config: true,
+    type: Boolean,
+    default: true,
+  });
+  game.settings.register("simple-message-window", "showPlayer", {
+    name: game.i18n.localize("SETTING.showPlayer.name"),
+    hint: game.i18n.localize("SETTING.showPlayer.hint"),
+    scope: "world",
+    config: true,
+    type: Boolean,
+    default: false,
+  });
+  game.settings.register("simple-message-window", "showRoll", {
+    name: game.i18n.localize("SETTING.showRoll.name"),
+    hint: game.i18n.localize("SETTING.showRoll.hint"),
+    scope: "world",
+    config: true,
+    type: Boolean,
+    default: false,
+  });
 });
 
 Hooks.once("ready", () => {
   isReady = true;
+});
+
+Hooks.on("renderSceneControls", async function () {
+  if (!$("#smw-control").length) {
+    $("#controls > .main-controls").append(
+      '<li class="scene-control" id="smw-control" title="Simple Message Window"><i class="fas fa-comment-alt"></i></li>'
+    );
+    updateIconState();
+    $("#smw-control").click(() => {
+      toggleSMW();
+    });
+  }
+  async function toggleSMW() {
+    const current = game.settings.get("simple-message-window", "smwEnable");
+    await game.settings.set("simple-message-window", "smwEnable", !current);
+    updateIconState();
+  }
+  function updateIconState() {
+    const isEnabled = game.settings.get("simple-message-window", "smwEnable");
+    const control = $("#smw-control");
+    if (isEnabled) {
+      control.addClass("toggle");
+    } else {
+      control.removeClass("toggle");
+    }
+  }
 });
 
 Hooks.on("canvasReady", () => {
@@ -25,9 +93,20 @@ Hooks.on("canvasReady", () => {
 });
 
 Hooks.on("renderChatMessage", async (message, html, data) => {
+  let smwEnable = game.settings.get("simple-message-window", "smwEnable");
+  if (!smwEnable) return;
+
   if (!isReady) return;
 
   // check to show message
+  let showCharacter = game.settings.get(
+    "simple-message-window",
+    "showCharacter"
+  );
+  let showGM = game.settings.get("simple-message-window", "showGM");
+  let showPlayer = game.settings.get("simple-message-window", "showPlayer");
+  let showRoll = game.settings.get("simple-message-window", "showRoll");
+
   const messageType = [];
   if (message.whisper.length > 0) messageType.push("whisper");
   if (message.rolls.length > 0) messageType.push("roll");
@@ -38,18 +117,22 @@ Hooks.on("renderChatMessage", async (message, html, data) => {
   if (messageType.includes("whisper")) {
     return;
   }
-  if (messageType.includes("rolls")) {
+  if (messageType.includes("rolls") && !showRoll) {
     return;
   }
-  if (messageType.includes("player")) {
+  if (messageType.includes("player") && !showPlayer) {
     return;
   }
-  if (messageType.includes("gamemaster")) {
-    if (game.modules.get("narrator-tools")?.active) {
-      if (message.flags["narrator-tools"]?.type == "narration") return;
-      if (message.flags["narrator-tools"]?.type == "description") return;
-    }
-    //return;
+  if (messageType.includes("gamemaster") && !showGM) {
+    return;
+  }
+  if (messageType.includes("character") && !showCharacter) {
+    return;
+  }
+  // Narrator Tools support
+  if (game.modules.get("narrator-tools")?.active) {
+    if (message.flags["narrator-tools"]?.type == "narration") return;
+    if (message.flags["narrator-tools"]?.type == "description") return;
   }
 
   // show message
