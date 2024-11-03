@@ -12,7 +12,7 @@ Hooks.once("init", () => {
 
   const portraitOverlay = document.createElement("div");
   portraitOverlay.id = "smw-portrait-overlay";
-  portraitOverlay.innerHTML = `<img src="" alt="アバター画像">`;
+  portraitOverlay.innerHTML = `<img src="" alt="Image">`;
   document.body.appendChild(portraitOverlay);
 });
 
@@ -27,6 +27,32 @@ Hooks.on("canvasReady", () => {
 Hooks.on("renderChatMessage", async (message, html, data) => {
   if (!isReady) return;
 
+  // check to show message
+  const messageType = [];
+  if (message.whisper.length > 0) messageType.push("whisper");
+  if (message.rolls.length > 0) messageType.push("roll");
+  if (!message.speaker.actor)
+    messageType.push(message.user.isGM ? "gamemaster" : "player");
+  else messageType.push("character");
+
+  if (messageType.includes("whisper")) {
+    return;
+  }
+  if (messageType.includes("rolls")) {
+    return;
+  }
+  if (messageType.includes("player")) {
+    return;
+  }
+  if (messageType.includes("gamemaster")) {
+    if (game.modules.get("narrator-tools")?.active) {
+      if (message.flags["narrator-tools"]?.type == "narration") return;
+      if (message.flags["narrator-tools"]?.type == "description") return;
+    }
+    //return;
+  }
+
+  // show message
   messageQueue.push(message);
 
   if (!isTyping) {
@@ -132,15 +158,6 @@ async function showMessage() {
     chatOverlay.style.display = "none";
     portraitOverlay.style.display = "none";
   });
-
-  // window timeout
-  let timeout = null;
-  if (timeout) {
-    setTimeout(() => {
-      chatOverlay.style.display = "none";
-      portraitOverlay.style.display = "none";
-    }, timeout);
-  }
 }
 
 // text animation
@@ -169,7 +186,6 @@ function animateText(element, htmlContent, speed, skipCheck) {
       // show next
       setTimeout(() => {
         isTyping = false;
-        element.innerHTML = "";
         showMessage();
       }, 500);
     }
