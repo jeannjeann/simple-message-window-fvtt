@@ -9,6 +9,11 @@ Hooks.once("init", () => {
   const chatOverlay = document.createElement("div");
   chatOverlay.id = "smw-chat-overlay";
   document.body.appendChild(chatOverlay);
+
+  const portraitOverlay = document.createElement("div");
+  portraitOverlay.id = "smw-portrait-overlay";
+  portraitOverlay.innerHTML = `<img src="" alt="アバター画像">`;
+  document.body.appendChild(portraitOverlay);
 });
 
 Hooks.once("ready", () => {
@@ -25,21 +30,71 @@ Hooks.on("renderChatMessage", async (message, html, data) => {
   messageQueue.push(message);
 
   if (!isTyping) {
-    console.log(messageQueue);
     showMessage();
   }
 });
 
+// set window size
+function adjustOverlaySize() {
+  const chatOverlay = document.getElementById("smw-chat-overlay");
+  const portraitOverlay = document.getElementById("smw-portrait-overlay");
+  if (!chatOverlay) return;
+
+  const board = document.getElementById("board");
+  const sidebar = document.getElementById("sidebar");
+
+  if (board && sidebar && chatOverlay) {
+    const boardWidth = board.offsetWidth;
+    const sidebarWidth = sidebar.offsetWidth;
+    const overlayWidth = boardWidth - sidebarWidth;
+
+    const chatWidth = overlayWidth * 0.7;
+    const chatHeight = overlayWidth * 0.15;
+    const chatLeft = overlayWidth / 2;
+    const chatBottom =
+      parseFloat(window.getComputedStyle(chatOverlay).bottom) || 0;
+
+    chatOverlay.style.width = `${chatWidth}px`;
+    chatOverlay.style.height = `${chatHeight}px`;
+    chatOverlay.style.left = `${chatLeft}px`;
+
+    const overlayHeight = chatOverlay.offsetHeight;
+    const headerHeight =
+      chatOverlay.querySelector(".smw-header")?.offsetHeight || 0;
+    const messageElement = chatOverlay.querySelector(".smw-message");
+    if (messageElement) {
+      const contentHeight = overlayHeight - headerHeight - 20;
+      messageElement.style.maxHeight = `${contentHeight}px`;
+    }
+
+    const portraitHeigt = chatHeight;
+    const portraitWidth = chatHeight;
+    const portraitLeft = chatLeft - chatWidth / 2 + portraitWidth / 2 + 10;
+    const portraitBottom = chatBottom + chatHeight;
+
+    portraitOverlay.style.height = `${portraitHeigt}px`;
+    portraitOverlay.style.width = `${portraitWidth}px`;
+    portraitOverlay.style.left = `${portraitLeft}px`;
+    portraitOverlay.style.bottom = `${portraitBottom}px`;
+  }
+}
+
+// show message text
 async function showMessage() {
   if (messageQueue.length == 0) return;
   isTyping = true;
 
   const chatOverlay = document.getElementById("smw-chat-overlay");
+  const portraitOverlay = document.getElementById("smw-portrait-overlay");
   if (!chatOverlay) return;
 
   const message = messageQueue.shift();
   const speaker = message.alias;
   const content = message.content;
+  const actor = game.actors?.get(message.speaker.actor) || null;
+  const token = game.tokens?.get(message.speaker.token) || null;
+  const characterImg = actor?.img;
+  const playerImg = message.user.avatar;
   const textspeed = 80;
 
   const window = await renderTemplate(
@@ -51,7 +106,14 @@ async function showMessage() {
   );
 
   chatOverlay.innerHTML = window;
+  if (characterImg) {
+    portraitOverlay.querySelector("img").src = characterImg;
+  } else {
+    portraitOverlay.querySelector("img").src = playerImg;
+  }
+
   chatOverlay.style.display = "block";
+  portraitOverlay.style.display = "block";
   adjustOverlaySize();
 
   let skip = false;
@@ -68,6 +130,7 @@ async function showMessage() {
   });
   chatOverlay.querySelector("#close-overlay").addEventListener("click", () => {
     chatOverlay.style.display = "none";
+    portraitOverlay.style.display = "none";
   });
 
   // window timeout
@@ -75,33 +138,8 @@ async function showMessage() {
   if (timeout) {
     setTimeout(() => {
       chatOverlay.style.display = "none";
+      portraitOverlay.style.display = "none";
     }, timeout);
-  }
-}
-
-function adjustOverlaySize() {
-  const chatOverlay = document.getElementById("smw-chat-overlay");
-  if (!chatOverlay) return;
-
-  const board = document.getElementById("board");
-  const sidebar = document.getElementById("sidebar");
-
-  if (board && sidebar && chatOverlay) {
-    const boardWidth = board.offsetWidth;
-    const sidebarWidth = sidebar.offsetWidth;
-    const overlayWidth = boardWidth - sidebarWidth;
-    chatOverlay.style.width = `${overlayWidth * 0.7}px`;
-    chatOverlay.style.height = `${overlayWidth * 0.2}px`;
-    chatOverlay.style.left = `calc(50% - ${sidebarWidth / 2}px)`;
-
-    const overlayHeight = chatOverlay.offsetHeight;
-    const headerHeight =
-      chatOverlay.querySelector(".smw-header")?.offsetHeight || 0;
-    const messageElement = chatOverlay.querySelector(".smw-message");
-    if (messageElement) {
-      const contentHeight = overlayHeight - headerHeight - 20;
-      messageElement.style.maxHeight = `${contentHeight}px`;
-    }
   }
 }
 
@@ -150,7 +188,6 @@ function animateText(element, htmlContent, speed, skipCheck) {
         index = nodes.length;
         setTimeout(() => {
           isTyping = false;
-          element.innerHTML = "";
           showMessage();
         }, 100);
       } else if (textIndex < text.length) {
