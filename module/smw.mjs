@@ -3,6 +3,7 @@
 // flags
 let isReady = false;
 let isTyping = false;
+let messageId = null;
 let messageQueue = [];
 
 Hooks.once("init", () => {
@@ -56,6 +57,14 @@ Hooks.once("init", () => {
     type: Boolean,
     default: false,
   });
+  game.settings.register("simple-message-window", "transparent", {
+    name: game.i18n.localize("SETTING.transparent.name"),
+    hint: game.i18n.localize("SETTING.transparent.hint"),
+    scope: "world",
+    config: true,
+    type: Number,
+    default: 10,
+  });
   game.settings.register("simple-message-window", "fontSize", {
     name: game.i18n.localize("SETTING.fontSize.name"),
     hint: game.i18n.localize("SETTING.fontSize.hint"),
@@ -72,9 +81,17 @@ Hooks.once("init", () => {
     type: Number,
     default: 100,
   });
-  game.settings.register("simple-message-window", "windowPosition", {
-    name: game.i18n.localize("SETTING.windowPosition.name"),
-    hint: game.i18n.localize("SETTING.windowPosition.hint"),
+  game.settings.register("simple-message-window", "windowHPosition", {
+    name: game.i18n.localize("SETTING.windowHPosition.name"),
+    hint: game.i18n.localize("SETTING.windowHPosition.hint"),
+    scope: "client",
+    config: true,
+    type: Number,
+    default: 50,
+  });
+  game.settings.register("simple-message-window", "windowVPosition", {
+    name: game.i18n.localize("SETTING.windowVPosition.name"),
+    hint: game.i18n.localize("SETTING.windowVPosition.hint"),
     scope: "client",
     config: true,
     type: Number,
@@ -112,6 +129,14 @@ Hooks.once("init", () => {
     type: Boolean,
     default: true,
   });
+  game.settings.register("simple-message-window", "imgTransparent", {
+    name: game.i18n.localize("SETTING.imgTransparent.name"),
+    hint: game.i18n.localize("SETTING.imgTransparent.hint"),
+    scope: "world",
+    config: true,
+    type: Number,
+    default: 10,
+  });
   game.settings.register("simple-message-window", "imgSize", {
     name: game.i18n.localize("SETTING.imgSize.name"),
     hint: game.i18n.localize("SETTING.imgSize.hint"),
@@ -129,7 +154,7 @@ Hooks.once("ready", () => {
 Hooks.on("renderSceneControls", async function () {
   if (!$("#smw-control").length) {
     $("#controls > .main-controls").append(
-      '<li class="scene-control" id="smw-control" title="Simple Message Window"><i class="fas fa-comment-alt"></i></li>'
+      '<li class="scene-control" id="smw-control" title="Simple Message Window Toggle"><i class="fas fa-comment-alt"></i></li>'
     );
     updateIconState();
     $("#smw-control").click(() => {
@@ -156,13 +181,113 @@ Hooks.on("canvasReady", () => {
   window.addEventListener("resize", adjustOverlaySize);
 });
 
-Hooks.on("renderChatMessage", async (message, html, data) => {
+Hooks.on("createChatMessage", async (message, html, data) => {
   let smwEnable = game.settings.get("simple-message-window", "smwEnable");
   if (!smwEnable) return;
-
   if (!isReady) return;
+  if (!showCheck(message)) return;
 
-  // check to show message
+  messageId = message.id;
+});
+
+Hooks.on("renderChatMessage", async (message, html, data) => {
+  if (messageId == message.id) {
+    messageQueue.push(message);
+    messageId = null;
+  }
+
+  if (!isTyping) {
+    showMessage();
+  }
+});
+
+// set window size
+function adjustOverlaySize() {
+  const chatOverlay = document.getElementById("smw-chat-overlay");
+  const portraitOverlay = document.getElementById("smw-portrait-overlay");
+  if (!chatOverlay) return;
+
+  const board = document.getElementById("board");
+  const sidebar = document.getElementById("sidebar");
+
+  if (board && sidebar && chatOverlay) {
+    const boardWidth = board.offsetWidth;
+    const sidebarWidth = sidebar.offsetWidth;
+    const overlayWidth = boardWidth - sidebarWidth;
+
+    // window transparent
+    let transparent =
+      game.settings.get("simple-message-window", "transparent") ?? 10;
+    const windowTransparent = (100 - transparent) / 100;
+    chatOverlay.style.setProperty(
+      "background-color",
+      `rgba(0, 0, 0, ${windowTransparent})`
+    );
+    chatOverlay.style.setProperty(
+      "color",
+      `rgba(255, 255, 255, ${windowTransparent})`
+    );
+
+    // image transparent
+    let imgtransparent =
+      game.settings.get("simple-message-window", "imgTransparent") ?? 10;
+    const imageTransparent = (100 - imgtransparent) / 100;
+    const imgOverlay = document.querySelector("#smw-portrait-overlay img");
+    imgOverlay.style.opacity = `${imageTransparent}`;
+
+    // window position
+    let windowVPositionSetting =
+      game.settings.get("simple-message-window", "windowVPosition") ?? 5;
+    chatOverlay.style.bottom = `${windowVPositionSetting}%`;
+    let windowHPositionSetting =
+      game.settings.get("simple-message-window", "windowHPosition") ?? 50;
+    const chatLeft = (overlayWidth / 100) * windowHPositionSetting;
+    chatOverlay.style.left = `${chatLeft}px`;
+
+    // window size
+    let windowWidthSetting =
+      game.settings.get("simple-message-window", "windowWidth") ?? 100;
+    let windowHeightSetting =
+      game.settings.get("simple-message-window", "windowHeight") ?? 100;
+    const chatWidth = (overlayWidth * 0.7 * windowWidthSetting) / 100;
+    const chatHeight = (overlayWidth * 0.15 * windowHeightSetting) / 100;
+    const chatBottom =
+      parseFloat(window.getComputedStyle(chatOverlay).bottom) || 0;
+
+    chatOverlay.style.width = `${chatWidth}px`;
+    chatOverlay.style.height = `${chatHeight}px`;
+
+    const overlayHeight = chatOverlay.offsetHeight;
+    const headerHeight =
+      chatOverlay.querySelector(".smw-header")?.offsetHeight || 0;
+    const messageElement = chatOverlay.querySelector(".smw-message");
+    if (messageElement) {
+      const contentHeight = overlayHeight - headerHeight - 20;
+      messageElement.style.maxHeight = `${contentHeight}px`;
+    }
+
+    // font size
+    let fontSizeSetting =
+      game.settings.get("simple-message-window", "fontSize") ?? 100;
+    const fontSize = (1.2 * fontSizeSetting) / 100;
+    chatOverlay.style.setProperty("font-size", `${fontSize}em`);
+
+    // portrait size
+    let imgSizeSetting =
+      game.settings.get("simple-message-window", "imgSize") ?? 100;
+    const portraitHeigt = (chatHeight * imgSizeSetting) / 100;
+    const portraitWidth = (chatHeight * imgSizeSetting) / 100;
+    const portraitLeft = chatLeft - chatWidth / 2 + portraitWidth / 2 + 10;
+    const portraitBottom = chatBottom + chatHeight;
+
+    portraitOverlay.style.height = `${portraitHeigt}px`;
+    portraitOverlay.style.width = `${portraitWidth}px`;
+    portraitOverlay.style.left = `${portraitLeft}px`;
+    portraitOverlay.style.bottom = `${portraitBottom}px`;
+  }
+}
+
+function showCheck(message) {
   let showCharacter = game.settings.get(
     "simple-message-window",
     "showCharacter"
@@ -198,77 +323,7 @@ Hooks.on("renderChatMessage", async (message, html, data) => {
     if (message.flags["narrator-tools"]?.type == "narration") return;
     if (message.flags["narrator-tools"]?.type == "description") return;
   }
-
-  // show message
-  messageQueue.push(message);
-
-  if (!isTyping) {
-    showMessage();
-  }
-});
-
-// set window size
-function adjustOverlaySize() {
-  const chatOverlay = document.getElementById("smw-chat-overlay");
-  const portraitOverlay = document.getElementById("smw-portrait-overlay");
-  if (!chatOverlay) return;
-
-  const board = document.getElementById("board");
-  const sidebar = document.getElementById("sidebar");
-
-  if (board && sidebar && chatOverlay) {
-    const boardWidth = board.offsetWidth;
-    const sidebarWidth = sidebar.offsetWidth;
-    const overlayWidth = boardWidth - sidebarWidth;
-
-    // window position
-    let windowPositionSetting =
-      game.settings.get("simple-message-window", "windowPosition") ?? 5;
-    chatOverlay.style.bottom = `${windowPositionSetting}%`;
-
-    // window size
-    let windowWidthSetting =
-      game.settings.get("simple-message-window", "windowWidth") ?? 100;
-    let windowHeightSetting =
-      game.settings.get("simple-message-window", "windowHeight") ?? 100;
-    const chatWidth = (overlayWidth * 0.7 * windowWidthSetting) / 100;
-    const chatHeight = (overlayWidth * 0.15 * windowHeightSetting) / 100;
-    const chatLeft = overlayWidth / 2;
-    const chatBottom =
-      parseFloat(window.getComputedStyle(chatOverlay).bottom) || 0;
-
-    chatOverlay.style.width = `${chatWidth}px`;
-    chatOverlay.style.height = `${chatHeight}px`;
-    chatOverlay.style.left = `${chatLeft}px`;
-
-    const overlayHeight = chatOverlay.offsetHeight;
-    const headerHeight =
-      chatOverlay.querySelector(".smw-header")?.offsetHeight || 0;
-    const messageElement = chatOverlay.querySelector(".smw-message");
-    if (messageElement) {
-      const contentHeight = overlayHeight - headerHeight - 20;
-      messageElement.style.maxHeight = `${contentHeight}px`;
-    }
-
-    // font size
-    let fontSizeSetting =
-      game.settings.get("simple-message-window", "fontSize") ?? 100;
-    const fontSize = (1.2 * fontSizeSetting) / 100;
-    chatOverlay.style.setProperty("font-size", `${fontSize}em`);
-
-    // portrait size
-    let imgSizeSetting =
-      game.settings.get("simple-message-window", "imgSize") ?? 100;
-    const portraitHeigt = (chatHeight * imgSizeSetting) / 100;
-    const portraitWidth = (chatHeight * imgSizeSetting) / 100;
-    const portraitLeft = chatLeft - chatWidth / 2 + portraitWidth / 2 + 10;
-    const portraitBottom = chatBottom + chatHeight;
-
-    portraitOverlay.style.height = `${portraitHeigt}px`;
-    portraitOverlay.style.width = `${portraitWidth}px`;
-    portraitOverlay.style.left = `${portraitLeft}px`;
-    portraitOverlay.style.bottom = `${portraitBottom}px`;
-  }
+  return true;
 }
 
 // show message text

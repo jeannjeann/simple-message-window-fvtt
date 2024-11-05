@@ -11,11 +11,18 @@ Simple Message Window module like Novel game
 https://github.com/jeannjeann/simple-message-window-fvtt/releases/latest/download/module.json
 
 ◆モジュールのインストール方法
+
 モッド・拡張機能、モジュールインストール、URLを指定に「ManifestURL」の文字を指定してインストールしてください。
 
 Please specify the letters "ManifestURL" in Mod Extensions, Module Installation, Specify URL and install.
 
 # CHANGELOG
+
+## 1.1.0
+- Polyglot対応→無理っぽい、かなり大変
+- add setting for horizontal position of message window
+- add setting for transparency of window background and image
+- bug fix
 
 ## 1.0.1
 - add hide default image (mystery-man.svg) option

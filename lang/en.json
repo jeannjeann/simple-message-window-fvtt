@@ -19,6 +19,10 @@
             "name": "Dice roll Messages",
             "hint": "Show dice roll message in window (default: on)"
         },
+        "transparent":{
+            "name": "Background transparency (%)",
+            "hint": "Transparency of the message window background as a percentage (0: Opaque, 100: Transparent, default: 10)"
+        },
         "fontSize":{
             "name": "Font size (%)",
             "hint": "Message window font size as a percentage (default: 100)"
@@ -27,7 +31,11 @@
             "name": "Text speed (%)",
             "hint": "Text speed as a percentage (default: 100)"
         },
-        "windowPosition":{
+        "windowHPosition":{
+            "name": "Horizontal position",
+            "hint": "Message window horizontal position (0: bottom, 100: top, default: 50)"
+        },
+        "windowVPosition":{
             "name": "Virtical position",
             "hint": "Message window virtical position (0: bottom, 100: top, default: 5)"
         },
@@ -46,6 +54,10 @@
         "hideMysteryman":{
             "name": "Hide Default Image",
             "hint": "Hide default image (icons/svg/mystery-man.svg, default: on)"
+        },
+        "imgTransparent":{
+            "name": "Image transparency (%)",
+            "hint": "Transparency of image as a percentage (0: Opaque, 100: Transparent, default: 10)"
         },
         "imgSize":{
             "name": "Image size (%)",
