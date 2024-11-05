@@ -8,6 +8,7 @@
 Simple Message Window module like Novel game
 
 ## ManifestURL
+
 https://github.com/jeannjeann/simple-message-window-fvtt/releases/latest/download/module.json
 
 ◆モジュールのインストール方法
@@ -19,7 +20,7 @@ Please specify the letters "ManifestURL" in Mod Extensions, Module Installation,
 # CHANGELOG
 
 ## 1.1.0
-- Polyglot対応→無理っぽい、かなり大変
+- support "Polyglot" module
 - add setting for horizontal position of message window
 - add setting for transparency of window background and image
 - bug fix

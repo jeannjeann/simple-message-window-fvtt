@@ -182,20 +182,24 @@ Hooks.on("canvasReady", () => {
 });
 
 Hooks.on("createChatMessage", async (message, html, data) => {
+  // check show condition
   let smwEnable = game.settings.get("simple-message-window", "smwEnable");
   if (!smwEnable) return;
   if (!isReady) return;
   if (!showCheck(message)) return;
 
+  // store message ID
   messageId = message.id;
 });
 
 Hooks.on("renderChatMessage", async (message, html, data) => {
+  // check correct message
   if (messageId == message.id) {
     messageQueue.push(message);
     messageId = null;
   }
 
+  // show message
   if (!isTyping) {
     showMessage();
   }
@@ -337,11 +341,39 @@ async function showMessage() {
 
   const message = messageQueue.shift();
   const speaker = message.alias;
-  const content = message.content;
   const actor = game.actors?.get(message.speaker.actor) || null;
   const token = game.tokens?.get(message.speaker.token) || null;
   const characterImg = actor?.img;
   const playerImg = message.user.avatar;
+  let content = message.content;
+
+  // support polyglot module
+  if (message.flags.polyglot) {
+    content = await temp();
+
+    async function temp() {
+      return new Promise((resolve, reject) => {
+        setTimeout(() => {
+          const targetMessage = game.messages.get(message.id);
+          if (targetMessage) {
+            const messageHTML = document.querySelector(
+              `.chat-message[data-message-id="${targetMessage._id}"]`
+            );
+            if (messageHTML) {
+              const preRenderedHTML =
+                messageHTML.querySelector(".message-content");
+              if (preRenderedHTML) {
+                const renderedHTML = preRenderedHTML.outerHTML
+                  .replace(/^\s*<div class="message-content">\s*/, "")
+                  .replace(/\s*<\/div>\s*$/, "");
+                resolve(renderedHTML);
+              }
+            }
+          }
+        }, 100);
+      });
+    }
+  }
 
   // text Speed
   let textSpeedSetting =
@@ -416,10 +448,13 @@ function animateText(element, htmlContent, speed, skipCheck) {
       const node = nodes[index];
       if (node.nodeType === Node.TEXT_NODE) {
         typeTextNode(node);
-      } else {
-        element.appendChild(node.cloneNode(true));
-        index++;
-        setTimeout(typeNode, speed);
+      } else if (node.nodeType === Node.ELEMENT_NODE) {
+        const span = document.createElement(node.tagName);
+        Array.from(node.attributes).forEach((attr) =>
+          span.setAttribute(attr.name, attr.value)
+        );
+        element.appendChild(span);
+        typeElementNode(span, node);
       }
     } else {
       // show next
@@ -427,6 +462,58 @@ function animateText(element, htmlContent, speed, skipCheck) {
         isTyping = false;
         showMessage();
       }, 500);
+    }
+  }
+
+  function typeElementNode(container, elementNode) {
+    const childNodes = Array.from(elementNode.childNodes);
+    let childIndex = 0;
+
+    function typeChild() {
+      if (childIndex < childNodes.length) {
+        const child = childNodes[childIndex];
+        if (child.nodeType === Node.TEXT_NODE) {
+          typeTextInElement(container, child);
+        } else if (child.nodeType === Node.ELEMENT_NODE) {
+          const childElement = document.createElement(child.tagName);
+          Array.from(child.attributes).forEach((attr) =>
+            childElement.setAttribute(attr.name, attr.value)
+          );
+          container.appendChild(childElement);
+          typeElementNode(childElement, child);
+        }
+        childIndex++;
+      } else {
+        index++;
+        setTimeout(typeNode, speed);
+      }
+    }
+
+    typeChild();
+
+    function typeTextInElement(container, textNode) {
+      const text = textNode.textContent;
+      let textIndex = 0;
+
+      function typeCharacter() {
+        if (skipCheck()) {
+          element.innerHTML = htmlContent;
+          element.scrollTop = element.scrollHeight;
+          index = nodes.length;
+          setTimeout(() => {
+            isTyping = false;
+            showMessage();
+          }, 100);
+        } else if (textIndex < text.length) {
+          container.innerHTML += text.charAt(textIndex);
+          textIndex++;
+          element.scrollTop = element.scrollHeight;
+          setTimeout(typeCharacter, speed);
+        } else {
+          setTimeout(typeChild, speed);
+        }
+      }
+      typeCharacter();
     }
   }
 
