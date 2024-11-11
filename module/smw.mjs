@@ -292,6 +292,7 @@ function adjustOverlaySize() {
 }
 
 function showCheck(message) {
+  console.log(message);
   let showCharacter = game.settings.get(
     "simple-message-window",
     "showCharacter"
@@ -307,10 +308,11 @@ function showCheck(message) {
     messageType.push(message.user.isGM ? "gamemaster" : "player");
   else messageType.push("character");
 
+  console.log(messageType);
   if (messageType.includes("whisper")) {
     return;
   }
-  if (messageType.includes("rolls") && !showRoll) {
+  if (messageType.includes("roll") && !showRoll) {
     return;
   }
   if (messageType.includes("player") && !showPlayer) {
