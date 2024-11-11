@@ -5,6 +5,7 @@ let isReady = false;
 let isTyping = false;
 let messageId = null;
 let messageQueue = [];
+let windowTimeout = null;
 
 Hooks.once("init", () => {
   //prepare overlay
@@ -56,6 +57,14 @@ Hooks.once("init", () => {
     config: true,
     type: Boolean,
     default: false,
+  });
+  game.settings.register("simple-message-window", "delayTime", {
+    name: game.i18n.localize("SETTING.delayTime.name"),
+    hint: game.i18n.localize("SETTING.delayTime.hint"),
+    scope: "client",
+    config: true,
+    type: Number,
+    default: 0,
   });
   game.settings.register("simple-message-window", "transparent", {
     name: game.i18n.localize("SETTING.transparent.name"),
@@ -332,10 +341,21 @@ function showCheck(message) {
 
 // show message text
 async function showMessage() {
-  if (messageQueue.length == 0) return;
-  isTyping = true;
   const chatOverlay = document.getElementById("smw-chat-overlay");
   const portraitOverlay = document.getElementById("smw-portrait-overlay");
+
+  if (messageQueue.length == 0) {
+    let delayTime =
+      game.settings.get("simple-message-window", "delayTime") ?? 0;
+    if (delayTime != 0) {
+      windowTimeout = setTimeout(() => {
+        chatOverlay.style.display = "none";
+        portraitOverlay.style.display = "none";
+      }, delayTime);
+    }
+    return;
+  }
+  isTyping = true;
 
   if (!chatOverlay) return;
 
@@ -349,9 +369,9 @@ async function showMessage() {
 
   // support polyglot module
   if (message.flags.polyglot) {
-    content = await temp();
+    content = await getPolyglotMessage();
 
-    async function temp() {
+    async function getPolyglotMessage() {
       return new Promise((resolve, reject) => {
         setTimeout(() => {
           const targetMessage = game.messages.get(message.id);

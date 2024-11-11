@@ -19,6 +19,10 @@
             "name": "Dice roll Messages",
             "hint": "Show dice roll message in window (default: on)"
         },
+        "delayTime":{
+            "name": " Time (in milliseconds) to hide",
+            "hint": " Time (in milliseconds) to hide the message window (0: do not hide, default: 0)"
+        },
         "transparent":{
             "name": "Background transparency (%)",
             "hint": "Transparency of the message window background as a percentage (0: Opaque, 100: Transparent, default: 10)"
