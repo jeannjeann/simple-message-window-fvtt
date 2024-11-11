@@ -19,6 +19,9 @@ Please specify the letters "ManifestURL" in Mod Extensions, Module Installation,
 
 # CHANGELOG
 
+## 1.1.1
+- bug fix (Show roll bug)
+
 ## 1.1.0
 - support "Polyglot" module
 - add setting for horizontal position of message window
