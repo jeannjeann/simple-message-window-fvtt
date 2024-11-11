@@ -292,7 +292,6 @@ function adjustOverlaySize() {
 }
 
 function showCheck(message) {
-  console.log(message);
   let showCharacter = game.settings.get(
     "simple-message-window",
     "showCharacter"
@@ -308,7 +307,6 @@ function showCheck(message) {
     messageType.push(message.user.isGM ? "gamemaster" : "player");
   else messageType.push("character");
 
-  console.log(messageType);
   if (messageType.includes("whisper")) {
     return;
   }
