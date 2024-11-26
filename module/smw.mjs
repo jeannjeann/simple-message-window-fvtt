@@ -365,7 +365,8 @@ async function showMessage() {
   const token = game.tokens?.get(message.speaker.token) || null;
   const characterImg = actor?.img;
   const playerImg = message.user.avatar;
-  let content = message.content;
+  //let content = message.content;
+  let content = message.flavor + message.content;
 
   // support polyglot module
   if (message.flags.polyglot) {
@@ -458,7 +459,6 @@ function animateText(element, htmlContent, speed, skipCheck) {
   const parser = new DOMParser();
   const parsedContent = parser.parseFromString(htmlContent, "text/html").body;
   const nodes = Array.from(parsedContent.childNodes);
-
   let index = 0;
 
   typeNode();
@@ -466,7 +466,10 @@ function animateText(element, htmlContent, speed, skipCheck) {
   function typeNode() {
     if (index < nodes.length) {
       const node = nodes[index];
-      if (node.nodeType === Node.TEXT_NODE) {
+      // node skip
+      if (skipNode(node)) {
+        index++;
+      } else if (node.nodeType === Node.TEXT_NODE) {
         typeTextNode(node);
       } else if (node.nodeType === Node.ELEMENT_NODE) {
         const parentElement = document.createElement(node.tagName);
@@ -474,7 +477,10 @@ function animateText(element, htmlContent, speed, skipCheck) {
           parentElement.setAttribute(attr.name, attr.value)
         );
         element.appendChild(parentElement);
-        typeElementNode(parentElement, node);
+        typeElementNode(parentElement, node, () => {
+          index++;
+          setTimeout(typeNode, speed);
+        });
       }
     } else {
       // show next
@@ -485,65 +491,86 @@ function animateText(element, htmlContent, speed, skipCheck) {
     }
   }
 
-  function typeElementNode(container, elementNode) {
+  function typeElementNode(container, elementNode, onComplete) {
     const childNodes = Array.from(elementNode.childNodes);
     let childIndex = 0;
+
+    typeChild();
 
     function typeChild() {
       if (childIndex < childNodes.length) {
         const child = childNodes[childIndex];
-        if (child.nodeType === Node.TEXT_NODE) {
-          typeTextInElement(container, child);
+        if (skipNode(child)) {
+          // skip childNode
+          childIndex++;
+          typeChild();
+        } else if (child.nodeType === Node.TEXT_NODE) {
+          typeTextInElement(container, child, () => {
+            childIndex++;
+            typeChild();
+          });
         } else if (child.nodeType === Node.ELEMENT_NODE) {
           const childElement = document.createElement(child.tagName);
           Array.from(child.attributes).forEach((attr) =>
             childElement.setAttribute(attr.name, attr.value)
           );
           container.appendChild(childElement);
-          typeElementNode(childElement, child);
+          typeElementNode(childElement, child, () => {
+            childIndex++;
+            typeChild();
+          });
         }
-        childIndex++;
       } else {
-        index++;
-        setTimeout(typeNode, speed);
+        onComplete();
       }
     }
+  }
 
-    typeChild();
-
-    function typeTextInElement(container, textNode) {
-      const text = textNode.textContent;
-      let textIndex = 0;
-
-      function typeCharacter() {
-        if (skipCheck()) {
-          element.innerHTML = htmlContent;
-          element.scrollTop = element.scrollHeight;
-          index = nodes.length;
-          setTimeout(() => {
-            isTyping = false;
-            showMessage();
-          }, 100);
-        } else if (textIndex < text.length) {
-          container.innerHTML += text.charAt(textIndex);
-          textIndex++;
-          element.scrollTop = element.scrollHeight;
-          setTimeout(typeCharacter, speed);
-        } else {
-          setTimeout(typeChild, speed);
-        }
-      }
-      typeCharacter();
+  function skipNode(node) {
+    let skip = false;
+    if (node.nodeType === Node.ELEMENT_NODE) {
+      if (node.classList?.contains("tooltip-part")) skip = true;
+      if (node.tagName === "BUTTON") skip = true;
     }
+    return skip;
+  }
+
+  function typeTextInElement(container, textNode, onComplete) {
+    const text = textNode.textContent;
+    let textIndex = 0;
+
+    function typeCharacter() {
+      const isSkipCharacter =
+        text.charAt(textIndex) === "" || text.charAt(textIndex) === " ";
+      const timeout = isSkipCharacter ? 0 : speed;
+      if (skipCheck()) {
+        element.innerHTML = htmlContent;
+        element.scrollTop = element.scrollHeight;
+        index = nodes.length;
+        setTimeout(() => {
+          isTyping = false;
+          showMessage();
+        }, 100);
+      } else if (textIndex < text.length) {
+        container.innerHTML += text.charAt(textIndex);
+        textIndex++;
+        element.scrollTop = element.scrollHeight;
+        setTimeout(typeCharacter, timeout);
+      } else {
+        onComplete();
+      }
+    }
+    typeCharacter();
   }
 
   function typeTextNode(textNode) {
     const text = textNode.textContent;
     let textIndex = 0;
 
-    typeCharacter();
-
     function typeCharacter() {
+      const isSkipCharacter =
+        text.charAt(textIndex) === "" || text.charAt(textIndex) === " ";
+      const timeout = isSkipCharacter ? 0 : speed;
       if (skipCheck()) {
         element.innerHTML = htmlContent;
         element.scrollTop = element.scrollHeight;
@@ -556,11 +583,12 @@ function animateText(element, htmlContent, speed, skipCheck) {
         element.innerHTML += text.charAt(textIndex);
         textIndex++;
         element.scrollTop = element.scrollHeight;
-        setTimeout(typeCharacter, speed);
+        setTimeout(typeCharacter, timeout);
       } else {
         index++;
-        setTimeout(typeNode, speed);
+        setTimeout(typeNode, timeout);
       }
     }
+    typeCharacter();
   }
 }
