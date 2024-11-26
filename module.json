@@ -9,7 +9,7 @@
     ],
     "url": "https://github.com/jeannjeann/simple-message-window-fvtt",
     "readme": "README.md",
-    "version": "1.2.0",
+    "version": "1.2.1",
     "compatibility": {
       "minimum": "11",
       "verified": "11.315",
@@ -30,7 +30,7 @@
         }
       ],
         "socket": false,
-    "manifest": "https://github.com/jeannjeann/simple-message-window-fvtt/releases/download/1.2.0/module.json",
-    "download": "https://github.com/jeannjeann/simple-message-window-fvtt/releases/download/1.2.0/module.zip"
+    "manifest": "https://github.com/jeannjeann/simple-message-window-fvtt/releases/download/1.2.1/module.json",
+    "download": "https://github.com/jeannjeann/simple-message-window-fvtt/releases/download/1.2.1/module.zip"
 }
   

@@ -365,7 +365,6 @@ async function showMessage() {
   const token = game.tokens?.get(message.speaker.token) || null;
   const characterImg = actor?.img;
   const playerImg = message.user.avatar;
-  //let content = message.content;
   let content = message.flavor + message.content;
 
   // support polyglot module
@@ -458,6 +457,7 @@ function animateText(element, htmlContent, speed, skipCheck) {
 
   const parser = new DOMParser();
   const parsedContent = parser.parseFromString(htmlContent, "text/html").body;
+  blackBGwhiteFont(parsedContent);
   const nodes = Array.from(parsedContent.childNodes);
   let index = 0;
 
@@ -526,11 +526,13 @@ function animateText(element, htmlContent, speed, skipCheck) {
     }
   }
 
+  // Node skip check
   function skipNode(node) {
     let skip = false;
     if (node.nodeType === Node.ELEMENT_NODE) {
       if (node.classList?.contains("tooltip-part")) skip = true;
       if (node.tagName === "BUTTON") skip = true;
+      //if (node.classList?.contains("collapsible-content")) skip = true; // for DnD5e System
     }
     return skip;
   }
@@ -591,4 +593,17 @@ function animateText(element, htmlContent, speed, skipCheck) {
     }
     typeCharacter();
   }
+}
+
+// enforce white font color and black background color
+function blackBGwhiteFont(contentElement) {
+  const allElements = contentElement.querySelectorAll("*");
+
+  allElements.forEach((el) => {
+    el.style.backgroundColor = "rgba(0, 0, 0, 0)";
+    el.style.color = "rgba(255, 255, 255, 0.9)";
+  });
+
+  contentElement.style.backgroundColor = "rgba(0, 0, 0, 0)";
+  contentElement.style.color = "rgba(255, 255, 255, 0.9)";
 }
