@@ -469,12 +469,12 @@ function animateText(element, htmlContent, speed, skipCheck) {
       if (node.nodeType === Node.TEXT_NODE) {
         typeTextNode(node);
       } else if (node.nodeType === Node.ELEMENT_NODE) {
-        const span = document.createElement(node.tagName);
+        const parentElement = document.createElement(node.tagName);
         Array.from(node.attributes).forEach((attr) =>
-          span.setAttribute(attr.name, attr.value)
+          parentElement.setAttribute(attr.name, attr.value)
         );
-        element.appendChild(span);
-        typeElementNode(span, node);
+        element.appendChild(parentElement);
+        typeElementNode(parentElement, node);
       }
     } else {
       // show next
