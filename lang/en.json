@@ -13,11 +13,15 @@
         },
         "showPlayer":{
             "name": "Player Messages",
-            "hint": "Show player message in window (default: on)"
+            "hint": "Show player message in window (default: off)"
+        },
+        "showOther":{
+            "name": "Other Messages",
+            "hint": "Show other message in window (default: off)"
         },
         "showRoll":{
             "name": "Dice roll Messages",
-            "hint": "Show dice roll message in window (default: on)"
+            "hint": "Show dice roll message in window (default: off)"
         },
         "delayTime":{
             "name": " Time (in milliseconds) to hide",

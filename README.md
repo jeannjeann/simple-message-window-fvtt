@@ -22,6 +22,10 @@ Please specify the letters "ManifestURL" in Mod Extensions, Module Installation,
 
 # CHANGELOG
 
+## 1.2.2
+- add setting for display other message
+- bug fix
+
 ## 1.2.1
 - fix display of complex messages
 - bug fix

@@ -50,6 +50,14 @@ Hooks.once("init", () => {
     type: Boolean,
     default: false,
   });
+  game.settings.register("simple-message-window", "showOther", {
+    name: game.i18n.localize("SETTING.showOther.name"),
+    hint: game.i18n.localize("SETTING.showOther.hint"),
+    scope: "world",
+    config: true,
+    type: Boolean,
+    default: false,
+  });
   game.settings.register("simple-message-window", "showRoll", {
     name: game.i18n.localize("SETTING.showRoll.name"),
     hint: game.i18n.localize("SETTING.showRoll.hint"),
@@ -307,6 +315,7 @@ function showCheck(message) {
   );
   let showGM = game.settings.get("simple-message-window", "showGM");
   let showPlayer = game.settings.get("simple-message-window", "showPlayer");
+  let showOther = game.settings.get("simple-message-window", "showOther");
   let showRoll = game.settings.get("simple-message-window", "showRoll");
 
   const messageType = [];
@@ -329,6 +338,9 @@ function showCheck(message) {
     return;
   }
   if (messageType.includes("character") && !showCharacter) {
+    return;
+  }
+  if (message.type == 0 && !showOther) {
     return;
   }
   // Narrator Tools support
