@@ -22,6 +22,10 @@ Please specify the letters "ManifestURL" in Mod Extensions, Module Installation,
 
 # CHANGELOG
 
+## 1.2.3
+- fix to correctly display images of unlinked tokens
+- bug fix
+
 ## 1.2.2
 - add setting for display other message
 - bug fix

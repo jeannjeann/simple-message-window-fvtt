@@ -374,8 +374,8 @@ async function showMessage() {
   const message = messageQueue.shift();
   const speaker = message.alias;
   const actor = game.actors?.get(message.speaker.actor) || null;
-  const token = game.tokens?.get(message.speaker.token) || null;
-  const characterImg = actor?.img;
+  const token = canvas.tokens?.get(message.speaker.token) || null;
+  const characterImg = token?.actor.img;
   const playerImg = message.user.avatar;
   let content = message.flavor + message.content;
 
