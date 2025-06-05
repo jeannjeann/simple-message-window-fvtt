@@ -321,9 +321,17 @@ function showCheck(message) {
   const messageType = [];
   if (message.whisper.length > 0) messageType.push("whisper");
   if (message.rolls.length > 0) messageType.push("roll");
-  if (!message.speaker.actor)
-    messageType.push(message.user.isGM ? "gamemaster" : "player");
-  else messageType.push("character");
+  if (!message.speaker.actor) {
+    const isV12Plus = foundry.utils.isNewerVersion(game.version, "12");
+    // v12 or later
+    if (isV12Plus) {
+      messageType.push(message.author.isGM ? "gamemaster" : "player");
+    }
+    // under v11
+    else {
+      messageType.push(message.user.isGM ? "gamemaster" : "player");
+    }
+  } else messageType.push("character");
 
   if (messageType.includes("whisper")) {
     return;
@@ -376,8 +384,10 @@ async function showMessage() {
   const actor = game.actors?.get(message.speaker.actor) || null;
   const token = canvas.tokens?.get(message.speaker.token) || null;
   const characterImg = token?.actor.img;
-  const playerImg = message.user.avatar;
   let content = message.flavor + message.content;
+  // v12 or later check
+  const isV12Plus = foundry.utils.isNewerVersion(game.version, "12");
+  const playerImg = isV12Plus ? message.author.avatar : message.user.avatar;
 
   // support polyglot module
   if (message.flags.polyglot) {
