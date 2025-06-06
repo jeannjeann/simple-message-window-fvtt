@@ -2,6 +2,7 @@
 
 ![Foundry v11](https://img.shields.io/badge/foundry-v11-green)
 ![Foundry v12](https://img.shields.io/badge/foundry-v12-green)
+![Foundry v13](https://img.shields.io/badge/foundry-v13-green)
 
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/X8X415YUSP)
 [![OFUSE](https://img.shields.io/badge/OFUSE-9cf.svg?style=for-the-badge)](https://ofuse.me/o?uid=81619)
@@ -21,6 +22,9 @@ https://github.com/jeannjeann/simple-message-window-fvtt/releases/latest/downloa
 Please specify the letters "ManifestURL" in Mod Extensions, Module Installation, Specify URL and install.
 
 # CHANGELOG
+
+## 2.0.0
+- v13 supported (Requires v13 or later)
 
 ## 1.2.4
 - v12 supported

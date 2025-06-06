@@ -168,15 +168,29 @@ Hooks.once("ready", () => {
   isReady = true;
 });
 
-Hooks.on("renderSceneControls", async function () {
-  if (!$("#smw-control").length) {
-    $("#controls > .main-controls").append(
-      '<li class="scene-control" id="smw-control" title="Simple Message Window Toggle"><i class="fas fa-comment-alt"></i></li>'
-    );
-    updateIconState();
-    $("#smw-control").click(() => {
-      toggleSMW();
-    });
+Hooks.on("renderSceneControls", (app, html, data) => {
+  const $html = $(html);
+  const targetMenu = $html.find("#scene-controls-layers");
+  if (targetMenu.length) {
+    const existingButton = targetMenu.find("#smw-control");
+    if (!existingButton.length) {
+      const smwButton = $(`
+                <li>
+                    <button type="button" class="control ui-control layer icon" 
+                            id="smw-control"
+                            title="Simple Message Window Toggle">
+                        <i class="fas fa-comment-alt"></i>
+                    </button>
+                </li>
+            `);
+      targetMenu.append(smwButton);
+      smwButton.find("button").on("click", () => {
+        toggleSMW();
+      });
+      updateIconState();
+    } else {
+      updateIconState();
+    }
   }
   async function toggleSMW() {
     const current = game.settings.get("simple-message-window", "smwEnable");
@@ -209,7 +223,7 @@ Hooks.on("createChatMessage", async (message, html, data) => {
   messageId = message.id;
 });
 
-Hooks.on("renderChatMessage", async (message, html, data) => {
+Hooks.on("renderChatMessageHTML", async (message, htmlElement, data) => {
   // check correct message
   if (messageId == message.id) {
     messageQueue.push(message);
@@ -322,15 +336,7 @@ function showCheck(message) {
   if (message.whisper.length > 0) messageType.push("whisper");
   if (message.rolls.length > 0) messageType.push("roll");
   if (!message.speaker.actor) {
-    const isV12Plus = foundry.utils.isNewerVersion(game.version, "12");
-    // v12 or later
-    if (isV12Plus) {
-      messageType.push(message.author.isGM ? "gamemaster" : "player");
-    }
-    // under v11
-    else {
-      messageType.push(message.user.isGM ? "gamemaster" : "player");
-    }
+    messageType.push(message.author.isGM ? "gamemaster" : "player");
   } else messageType.push("character");
 
   if (messageType.includes("whisper")) {
@@ -385,9 +391,7 @@ async function showMessage() {
   const token = canvas.tokens?.get(message.speaker.token) || null;
   const characterImg = token?.actor.img;
   let content = message.flavor + message.content;
-  // v12 or later check
-  const isV12Plus = foundry.utils.isNewerVersion(game.version, "12");
-  const playerImg = isV12Plus ? message.author.avatar : message.user.avatar;
+  const playerImg = message.author.avatar;
 
   // support polyglot module
   if (message.flags.polyglot) {
@@ -422,7 +426,7 @@ async function showMessage() {
     game.settings.get("simple-message-window", "textSpeed") ?? 100;
   const textspeed = 80 / (textSpeedSetting / 100);
 
-  const window = await renderTemplate(
+  const window = await foundry.applications.handlebars.renderTemplate(
     "modules/simple-message-window/templates/smw.hbs",
     {
       speaker: speaker,
