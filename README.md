@@ -9,17 +9,23 @@
 
 シンプルなノベルゲーム風のメッセージウィンドウを表示するモジュール
 
-Simple Message Window module like Novel game
+Simple message window module like Novel game
 
-## ManifestURL
+## インストール  Install
 
-https://github.com/jeannjeann/simple-message-window-fvtt/releases/latest/download/module.json
+### 方法1  Method 1
 
-◆モジュールのインストール方法
+FVTTの「モッド・拡張機能」の「モジュールを入手」ウィンドウで、「Simple Message Window」を検索してインストールしてください。
 
-モッド・拡張機能、モジュールインストール、URLを指定に「ManifestURL」の文字を指定してインストールしてください。
+In 'Install Module' window of Foundry VTT's 'Add-on Modules', search for 'Simple Message Window' and install it.
 
-Please specify the letters "ManifestURL" in Mod Extensions, Module Installation, Specify URL and install.
+### 方法2  Method 2
+
+ManifestURL: https://github.com/jeannjeann/simple-message-window-fvtt/releases/latest/download/module.json
+
+FVTTの「モッド・拡張機能」の「モジュールを入手」ウィンドウで、「URLを指定」の欄に上記の「ManifestURL」をペーストしてインストールしてください。
+
+In 'Install Module' window of Foundry VTT's 'Add-on Modules', paste the above 'ManifestURL' into the 'Manifest URL' field and install it.
 
 # CHANGELOG
 
