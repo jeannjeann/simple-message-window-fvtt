@@ -29,8 +29,14 @@ In 'Install Module' window of Foundry VTT's 'Add-on Modules', paste the above 'M
 
 # CHANGELOG
 
+## 2.0.1
+- bug fix
+
 ## 2.0.0
 - v13 supported (Requires v13 or later)
+
+## 1.2.5
+- bug fix
 
 ## 1.2.4
 - v12 supported
