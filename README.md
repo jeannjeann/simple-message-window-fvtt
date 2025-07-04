@@ -22,6 +22,9 @@ Please specify the letters "ManifestURL" in Mod Extensions, Module Installation,
 
 # CHANGELOG
 
+## 1.2.5
+- bug fix
+
 ## 1.2.4
 - v12 supported
 
