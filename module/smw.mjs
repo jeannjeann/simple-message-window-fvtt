@@ -50,17 +50,17 @@ Hooks.once("init", () => {
     type: Boolean,
     default: false,
   });
-  game.settings.register("simple-message-window", "showOther", {
-    name: game.i18n.localize("SETTING.showOther.name"),
-    hint: game.i18n.localize("SETTING.showOther.hint"),
+  game.settings.register("simple-message-window", "showRoll", {
+    name: game.i18n.localize("SETTING.showRoll.name"),
+    hint: game.i18n.localize("SETTING.showRoll.hint"),
     scope: "world",
     config: true,
     type: Boolean,
     default: false,
   });
-  game.settings.register("simple-message-window", "showRoll", {
-    name: game.i18n.localize("SETTING.showRoll.name"),
-    hint: game.i18n.localize("SETTING.showRoll.hint"),
+  game.settings.register("simple-message-window", "showOther", {
+    name: game.i18n.localize("SETTING.showOther.name"),
+    hint: game.i18n.localize("SETTING.showOther.hint"),
     scope: "world",
     config: true,
     type: Boolean,
@@ -112,7 +112,7 @@ Hooks.once("init", () => {
     scope: "client",
     config: true,
     type: Number,
-    default: 5,
+    default: 10,
   });
   game.settings.register("simple-message-window", "windowWidth", {
     name: game.i18n.localize("SETTING.windowWidth.name"),
