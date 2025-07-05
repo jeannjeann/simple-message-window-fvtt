@@ -11,6 +11,24 @@
 
 Simple message window module like Novel game
 
+## 特徴  Features
+
+- 立ち絵とメッセージをシンプルなメッセージウィンドウに表示する
+- 発言種別ごとにウィンドウへの表示・非表示を選択できる
+- ウィンドウの位置、大きさ、透過度を設定できる
+- 立ち絵の大きさ、透過度を設定できる
+- フォントの大きさを設定できる
+- 字送りの速度を設定できる
+- 自動でウィンドウを閉じるまでの時間を設定できる
+
+- Display character pictures and messages in a simple message window
+- Display or not display in the window can be selected for each type of message.
+- Set window position, size, and transparency.
+- Size, transparency of the picture can be set.
+- Font size can be set.
+- Set the character feed speed.
+- Set the time until the window automatically closes.
+
 ## インストール  Install
 
 ### 方法1  Method 1
