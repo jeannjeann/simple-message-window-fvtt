@@ -354,8 +354,14 @@ function showCheck(message) {
   if (messageType.includes("character") && !showCharacter) {
     return;
   }
-  if (message.type == 0 && !showOther) {
-    return;
+  if (game.version >= 12) {
+    if (message.style == 0 && !showOther) {
+      return;
+    }
+  } else {
+    if (message.type == 0 && !showOther) {
+      return;
+    }
   }
   // Narrator Tools support
   if (game.modules.get("narrator-tools")?.active) {
