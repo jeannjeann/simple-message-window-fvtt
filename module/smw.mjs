@@ -334,7 +334,7 @@ function showCheck(message) {
 
   const messageType = [];
   if (message.whisper.length > 0) messageType.push("whisper");
-  if (message.rolls.length > 0) messageType.push("roll");
+  if (message.rolls.length > 0 || message.isRoll) messageType.push("roll");
   if (!message.speaker.actor) {
     messageType.push(message.author.isGM ? "gamemaster" : "player");
   } else messageType.push("character");
