@@ -320,7 +320,7 @@ function showCheck(message) {
 
   const messageType = [];
   if (message.whisper.length > 0) messageType.push("whisper");
-  if (message.rolls.length > 0) messageType.push("roll");
+  if (message.rolls.length > 0 || message.isRoll) messageType.push("roll");
   if (!message.speaker.actor) {
     const isV12Plus = foundry.utils.isNewerVersion(game.version, "12");
     // v12 or later
