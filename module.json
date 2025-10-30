@@ -16,7 +16,7 @@
     },
     "esmodules": [
       "module/smw.mjs",
-      "module/mct-settings.mjs"
+      "module/settings.mjs"
     ],
     "styles": ["css/smw.css"],
     "languages": [
