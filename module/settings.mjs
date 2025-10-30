@@ -209,6 +209,7 @@ export class MCTSettingsDialog extends HandlebarsApplicationMixin(
       "mctDisplayTabs"
     );
 
+    // Set default setting
     if (displayTabs === undefined || displayTabs === null) {
       const firstTabId = allTabs[0]?.id;
       displayTabs = firstTabId ? [firstTabId] : [];
@@ -218,6 +219,7 @@ export class MCTSettingsDialog extends HandlebarsApplicationMixin(
         displayTabs
       );
     } else {
+      // clean up invalid tab id
       const validTabIds = allTabs.map((t) => t.id);
       const cleanedDisplayTabs = displayTabs.filter((id) =>
         validTabIds.includes(id)
@@ -245,6 +247,7 @@ export class MCTSettingsDialog extends HandlebarsApplicationMixin(
   }
 
   static async #onCheckboxChange(event, form, formData) {
+    // list display tabs
     const displayTabs = Object.entries(formData.object)
       .filter(([_id, checked]) => !checked)
       .map(([id, _checked]) => id);
