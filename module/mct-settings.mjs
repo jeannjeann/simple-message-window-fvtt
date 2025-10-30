@@ -1,21 +1,33 @@
 // MCTSettingsDialog class
-export class MCTSettingsDialog extends FormApplication {
-  static get defaultOptions() {
-    const options = super.defaultOptions;
-    const newOptions = {
-      id: "smw-mct-settings",
-      title: game.i18n.localize("SETTING.mctDialog.title"),
-      template: "modules/simple-message-window/templates/mct-settings.hbs",
+const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
+export class MCTSettingsDialog extends HandlebarsApplicationMixin(
+  ApplicationV2
+) {
+  static DEFAULT_OPTIONS = {
+    classes: ["smw-mct-dialog"],
+    id: "smw-mct-settings",
+    tag: "form",
+    position: {
       width: 400,
       height: "auto",
-      classes: ["smw-mct-dialog"],
+    },
+    window: {
+      title: "SETTING.mctDialog.title",
+    },
+    form: {
+      submitOnChange: true,
+      handler: MCTSettingsDialog.#onCheckboxChange,
       closeOnSubmit: false,
-      submitOnChange: false,
-    };
-    return foundry.utils.mergeObject(options, newOptions);
-  }
+    },
+  };
 
-  async getData() {
+  static PARTS = {
+    form: {
+      template: "modules/simple-message-window/templates/mct-settings.hbs",
+    },
+  };
+
+  async _prepareContext() {
     const tabsJSON = game.settings.get("multiple-chat-tabs", "tabs") || "[]";
     const allTabs = JSON.parse(tabsJSON);
 
@@ -31,7 +43,6 @@ export class MCTSettingsDialog extends FormApplication {
       "mctDisplayTabs"
     );
 
-    // Set default setting
     if (displayTabs === undefined || displayTabs === null) {
       const firstTabId = allTabs[0]?.id;
       displayTabs = firstTabId ? [firstTabId] : [];
@@ -41,7 +52,6 @@ export class MCTSettingsDialog extends FormApplication {
         displayTabs
       );
     } else {
-      // clean up invalid tab id
       const validTabIds = allTabs.map((t) => t.id);
       const cleanedDisplayTabs = displayTabs.filter((id) =>
         validTabIds.includes(id)
@@ -68,19 +78,8 @@ export class MCTSettingsDialog extends FormApplication {
     };
   }
 
-  activateListeners(html) {
-    super.activateListeners(html);
-    html
-      .find('input[type="checkbox"]')
-      .on("change", this._onCheckboxChange.bind(this));
-  }
-
-  async _onCheckboxChange(event) {
-    const form = this.form;
-    const formData = new FormDataExtended(form).object;
-
-    // list display tabs
-    const displayTabs = Object.entries(formData)
+  static async #onCheckboxChange(event, form, formData) {
+    const displayTabs = Object.entries(formData.object)
       .filter(([_id, checked]) => !checked)
       .map(([id, _checked]) => id);
 
@@ -89,8 +88,5 @@ export class MCTSettingsDialog extends FormApplication {
       "mctDisplayTabs",
       displayTabs
     );
-    this.render();
   }
-
-  async _updateObject(event, formData) {}
 }
