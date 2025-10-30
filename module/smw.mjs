@@ -388,7 +388,7 @@ function showCheck(message) {
     return;
   }
   if (game.version >= 12) {
-    if (message.style == 0 && !showOther) {
+    if (message.style == 0 && !messageType.includes("roll") && !showOther) {
       return;
     }
   } else {
