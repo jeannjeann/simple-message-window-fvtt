@@ -15,7 +15,10 @@
       "verified": "12.343",
       "maximum": "12"
     },
-    "esmodules": ["module/smw.mjs"],
+    "esmodules": [
+      "module/smw.mjs",
+      "module/mct-settings.mjs"
+    ],
     "styles": ["css/smw.css"],
     "languages": [
         {
