@@ -1,4 +1,5 @@
 // module/smw.mjs
+import { MCTSettingsDialog } from "./mct-settings.mjs";
 
 // flags
 let isReady = false;
@@ -72,7 +73,7 @@ Hooks.once("init", () => {
     scope: "client",
     config: true,
     type: Number,
-    default: 0,
+    default: 10000,
   });
   game.settings.register("simple-message-window", "transparent", {
     name: game.i18n.localize("SETTING.transparent.name"),
@@ -162,6 +163,22 @@ Hooks.once("init", () => {
     type: Number,
     default: 100,
   });
+  if (game.modules.get("multiple-chat-tabs")?.active) {
+    game.settings.register("simple-message-window", "mctDisplayTabs", {
+      scope: "client",
+      config: false,
+      type: Array,
+      default: undefined,
+    });
+    game.settings.registerMenu("simple-message-window", "mctSettings", {
+      name: game.i18n.localize("SETTING.mct.name"),
+      label: game.i18n.localize("SETTING.mct.label"),
+      hint: game.i18n.localize("SETTING.mct.hint"),
+      icon: "fas fa-comments",
+      type: MCTSettingsDialog,
+      restricted: true,
+    });
+  }
 });
 
 Hooks.once("ready", () => {
@@ -323,6 +340,28 @@ function adjustOverlaySize() {
 }
 
 function showCheck(message) {
+  // MCT integration
+  if (game.modules.get("multiple-chat-tabs")?.active) {
+    // Display tab by MCT
+    const visibleTabs = MCTFilter.getVisibleTabsForMessage(message);
+    if (visibleTabs.size === 0) {
+      return false;
+    }
+    // Display tab by SMW
+    const displayTabs = game.settings.get(
+      "simple-message-window",
+      "mctDisplayTabs"
+    );
+    if (!displayTabs || displayTabs.length === 0) return false;
+    // check display tabs
+    const isTarget = [...visibleTabs].some((tabId) =>
+      displayTabs.includes(tabId)
+    );
+    if (!isTarget) {
+      return false;
+    }
+  }
+
   let showCharacter = game.settings.get(
     "simple-message-window",
     "showCharacter"
@@ -354,15 +393,10 @@ function showCheck(message) {
   if (messageType.includes("character") && !showCharacter) {
     return;
   }
-  if (game.version >= 12) {
-    if (message.style == 0 && !showOther) {
-      return;
-    }
-  } else {
-    if (message.type == 0 && !showOther) {
-      return;
-    }
+  if (message.style == 0 && !messageType.includes("roll") && !showOther) {
+    return;
   }
+
   // Narrator Tools support
   if (game.modules.get("narrator-tools")?.active) {
     if (message.flags["narrator-tools"]?.type == "narration") return;
@@ -639,3 +673,103 @@ function blackBGwhiteFont(contentElement) {
   contentElement.style.backgroundColor = "rgba(0, 0, 0, 0)";
   contentElement.style.color = "rgba(255, 255, 255, 0.9)";
 }
+
+// MCT integration logic
+const MCTFilter = {
+  /**
+   * @param {ChatMessage} message
+   * @returns {string}
+   */
+  getMessageType(message) {
+    const api = game.modules.get("multiple-chat-tabs")?.api;
+    if (!api) return "other";
+    if (message.isRoll) return "roll";
+
+    switch (message.style) {
+      case CONST.CHAT_MESSAGE_STYLES.IC:
+        return "ic";
+      case CONST.CHAT_MESSAGE_STYLES.OOC:
+        return "ooc";
+      default:
+        return "other";
+    }
+  },
+
+  /**
+   * @param {ChatMessage} message
+   * @returns {Set<string>}
+   */
+  getVisibleTabsForMessage(message) {
+    const api = game.modules.get("multiple-chat-tabs")?.api;
+    const tabsJSON = game.settings.get("multiple-chat-tabs", "tabs") || "[]";
+    const allTabs = JSON.parse(tabsJSON);
+
+    if (!message || !api || allTabs.length === 0) return new Set();
+
+    // Whisper
+    if (message.whisper.length > 0) {
+      const authorId = message.author.id;
+      const whisperGroup = new Set(
+        [authorId, ...message.whisper].filter(Boolean)
+      );
+
+      const matchingWhisperTabs = allTabs.filter((tab) => {
+        if (
+          !tab.isWhisperTab ||
+          !tab.whisperTargets ||
+          tab.whisperTargets.length === 0
+        ) {
+          return false;
+        }
+        const tabTargets = new Set(tab.whisperTargets.filter(Boolean));
+        return (
+          tabTargets.size === whisperGroup.size &&
+          [...whisperGroup].every((id) => tabTargets.has(id))
+        );
+      });
+
+      if (matchingWhisperTabs.length > 0) {
+        return new Set(matchingWhisperTabs.map((t) => t.id));
+      }
+    }
+
+    const messageType = this.getMessageType(message);
+
+    // Move
+    const moveTarget = allTabs.find(
+      (tab) => !tab.isWhisperTab && tab.force?.[messageType] === "move"
+    );
+    if (moveTarget) {
+      return new Set([moveTarget.id]);
+    }
+
+    const visibleTabIds = new Set();
+    const defaultTabId = allTabs[0]?.id;
+    let sourceTabId = message.getFlag("multiple-chat-tabs", "sourceTab");
+
+    const isValidSource =
+      sourceTabId && allTabs.some((tab) => tab.id === sourceTabId);
+
+    if (isValidSource) {
+      visibleTabIds.add(sourceTabId);
+    } else {
+      const shouldFallback = game.settings.get(
+        "multiple-chat-tabs",
+        "showAloneMessageToDefaultTab"
+      );
+      if (shouldFallback && defaultTabId) {
+        visibleTabIds.add(defaultTabId);
+      }
+    }
+
+    // Duplicate
+    const duplicateTargets = allTabs.filter(
+      (tab) => !tab.isWhisperTab && tab.force?.[messageType] === "duplicate"
+    );
+    for (const target of duplicateTargets) {
+      visibleTabIds.add(target.id);
+    }
+
+    return visibleTabIds;
+  },
+};
