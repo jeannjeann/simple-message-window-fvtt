@@ -28,7 +28,7 @@
             "hint": " Time (in milliseconds) to hide the message window (0: do not hide, default: 10000)"
         },
         "transparent":{
-            "name": "Background transparency (%)",
+            "name": "Window transparency (%)",
             "hint": "Transparency of the message window background as a percentage (0: Opaque, 100: Transparent, default: 10)"
         },
         "fontSize":{
@@ -70,6 +70,22 @@
         "imgSize":{
             "name": "Image size (%)",
             "hint": "Image size as a percentage (default: 100)"
+        },
+        "layoutMenu": {
+            "name": "Window Layout Adjustment",
+            "label": "Layout Adjustment",
+            "hint": "Adjust the position, size, transparency, font size, and text speed."
+        },
+        "layout": {
+            "guiMode": "GUI Mode",
+            "guiModeStart": "Start GUI Mode",
+            "guiModeEnd": "End GUI Mode",
+            "reset": "Reset",
+            "save": "Save Changes",
+            "groupWindow": "Message Window Settings",
+            "groupImage": "Image Settings",
+            "previewHeader": "Simple Message Window",
+            "previewMessage": "This is a preview display.\n\nYou can adjust various settings related to the display of the message window and character images using sliders and numeric inputs.\n\nBy starting GUI mode, you can change settings by mouse dragging.\n\nDon't forget to save after making changes!!!"
         },
         "mct": {
             "name": "Multiple Chat Tabs Integration",

@@ -1,0 +1,39 @@
+<form autocomplete="off">
+    <header class="smw-layout-header">
+        <button type="button" data-action="toggle-gui" title="{{labels.guiModeStart}}">
+            <i class="fas fa-toggle-off"></i> <span>{{labels.guiMode}}</span>
+        </button>
+        <button type="button" data-action="reset-settings">
+            <i class="fas fa-undo"></i> <span>{{labels.reset}}</span>
+        </button>
+        <button type="submit">
+            <i class="fas fa-save"></i> <span>{{labels.save}}</span>
+        </button>
+    </header>
+
+    <fieldset>
+        <legend>{{labels.groupWindow}}</legend>
+        {{#each settings.window as |setting key|}}
+        <div class="form-group">
+            <label for="smw-{{key}}" title="{{setting.hint}}">{{setting.label}}</label>
+            <div class="form-fields">
+                <input type="range" name="{{key}}" value="{{setting.value}}" min="{{setting.min}}" max="{{setting.max}}" step="1">
+                <input type="number" name="{{key}}" value="{{setting.value}}" min="{{setting.min}}" max="{{setting.max}}" step="1">
+            </div>
+        </div>
+        {{/each}}
+    </fieldset>
+
+    <fieldset>
+        <legend>{{labels.groupImage}}</legend>
+        {{#each settings.image as |setting key|}}
+        <div class="form-group">
+            <label for="smw-{{key}}" title="{{setting.hint}}">{{setting.label}}</label>
+            <div class="form-fields">
+                <input type="range" name="{{key}}" value="{{setting.value}}" min="{{setting.min}}" max="{{setting.max}}" step="1">
+                <input type="number" name="{{key}}" value="{{setting.value}}" min="{{setting.min}}" max="{{setting.max}}" step="1">
+            </div>
+        </div>
+        {{/each}}
+    </fieldset>
+</form>
