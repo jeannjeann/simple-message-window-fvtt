@@ -71,6 +71,23 @@
             "name": "画像サイズ（％）",
             "hint": "キャラクター画像のサイズを割合（％）で指定（初期値：100）"
         },
+        "layoutMenu": {
+            "name": "ウィンドウレイアウト調整",
+            "label": "レイアウト調整",
+            "hint": "ウィンドウの位置、サイズ、透過度、フォントサイズ、字送り速度を調整"
+        },
+        "layout": {
+            "title": "レイアウト調整",
+            "guiMode": "GUIモード",
+            "guiModeStart": "GUIモード開始",
+            "guiModeEnd": "GUIモード終了",
+            "reset": "リセット",
+            "save": "変更を保存",
+            "groupWindow": "メッセージウィンドウ設定",
+            "groupImage": "画像設定",
+            "previewHeader": "Simple Message Window",
+            "previewMessage": "これはプレビュー表示です。\n\nメッセージウィンドウの表示とキャラクター画像の表示に関する各種設定をスライダーや数字入力で調整できます。\n\nGUIモードでは、マウス操作によってメッセージウィンドウとキャラクター画像の位置とサイズを変更できます。\n\n設定変更後は保存を忘れずに！！！"
+        },
         "mct": {
             "name": "Multiple Chat Tabs 連携",
             "label": "非表示タブ選択",

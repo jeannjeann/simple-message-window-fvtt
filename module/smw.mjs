@@ -529,6 +529,7 @@ const MCTFilter = {
     if (message.isRoll) return "roll";
 
     if (api.isV11()) {
+      // under v11
       switch (message.type) {
         case CONST.CHAT_MESSAGE_TYPES.IC:
           return "ic";
@@ -538,7 +539,7 @@ const MCTFilter = {
           return "other";
       }
     } else {
-      // v12+
+      // v12 or later
       switch (message.style) {
         case CONST.CHAT_MESSAGE_STYLES.IC:
           return "ic";
