@@ -1,4 +1,4 @@
-<form autocomplete="off">
+<section>
     <header class="smw-layout-header">
         <button type="button" data-action="toggle-gui" title="{{labels.guiModeStart}}">
             <i class="fas fa-toggle-off"></i> <span>{{labels.guiMode}}</span>
@@ -18,7 +18,7 @@
             <label for="smw-{{key}}" title="{{setting.hint}}">{{setting.label}}</label>
             <div class="form-fields">
                 <input type="range" name="{{key}}" value="{{setting.value}}" min="{{setting.min}}" max="{{setting.max}}" step="1">
-                <input type="number" name="{{key}}" value="{{setting.value}}" min="{{setting.min}}" max="{{setting.max}}" step="1">
+                <input type="number" name="{{key}}" value="{{setting.value}}" step="1">
             </div>
         </div>
         {{/each}}
@@ -31,9 +31,9 @@
             <label for="smw-{{key}}" title="{{setting.hint}}">{{setting.label}}</label>
             <div class="form-fields">
                 <input type="range" name="{{key}}" value="{{setting.value}}" min="{{setting.min}}" max="{{setting.max}}" step="1">
-                <input type="number" name="{{key}}" value="{{setting.value}}" min="{{setting.min}}" max="{{setting.max}}" step="1">
+                <input type="number" name="{{key}}" value="{{setting.value}}" step="1">
             </div>
         </div>
         {{/each}}
     </fieldset>
-</form>
+</section>

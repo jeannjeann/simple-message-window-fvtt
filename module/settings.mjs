@@ -172,31 +172,40 @@ export class SMWSettings {
   }
 }
 
-// LayoutSettingsDialog class
-class LayoutSettingsDialog extends FormApplication {
-  constructor(object, options) {
-    super(object, options);
-    this._previewElements = null;
-    this._animationTimeout = null;
-    this._isGuiMode = false;
-    this._dragData = null;
-  }
-  static get defaultOptions() {
-    return {
-      ...super.defaultOptions,
-      id: "smw-layout-settings",
-      title: game.i18n.localize("SETTING.layout.title"),
-      template: "modules/simple-message-window/templates/layout-settings.hbs",
-      width: 400,
-      height: 450,
-      classes: ["smw-layout-dialog"],
-      closeOnSubmit: true,
-      submitOnChange: false,
-      resizable: true,
-    };
-  }
+const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
-  getData(options) {
+// LayoutSettingsDialog class
+class LayoutSettingsDialog extends HandlebarsApplicationMixin(ApplicationV2) {
+  _previewElements = null;
+  _animationTimeout = null;
+  _isGuiMode = false;
+  _dragData = null;
+
+  static DEFAULT_OPTIONS = {
+    id: "smw-layout-settings",
+    classes: ["smw-layout-dialog"],
+    tag: "form",
+    position: {
+      width: 450,
+      height: 500,
+    },
+    window: {
+      title: "SETTING.layout.title",
+      resizable: true,
+    },
+    form: {
+      handler: LayoutSettingsDialog.#onSubmit,
+      closeOnSubmit: true,
+    },
+  };
+
+  static PARTS = {
+    form: {
+      template: "modules/simple-message-window/templates/layout-settings.hbs",
+    },
+  };
+
+  async _prepareContext(options) {
     const settingsData = {
       window: {
         windowHPosition: { min: 0, max: 100 },
@@ -248,8 +257,10 @@ class LayoutSettingsDialog extends FormApplication {
     };
   }
 
-  async _render(force, options) {
-    await super._render(force, options);
+  _onRender(context, options) {
+    super._onRender(context, options);
+    const html = this.element;
+
     if (!this._previewElements) {
       // Create preview
       const windowEl = document.createElement("div");
@@ -277,9 +288,37 @@ class LayoutSettingsDialog extends FormApplication {
     this._updateGuiModeVisuals();
     this._updatePreview();
     this._startPreviewAnimation();
+
+    // Activate Listeners
+    const $html = $(html);
+    // GUI Toggle Button
+    $html.find('[data-action="toggle-gui"]').on("click", (event) => {
+      event.preventDefault();
+      this._isGuiMode = !this._isGuiMode;
+      this._updateGuiModeVisuals();
+    });
+    // Reset Button
+    $html
+      .find('[data-action="reset-settings"]')
+      .on("click", this._onResetSettings.bind(this));
+    // Input listener
+    const inputs = $html.find('input[type="range"], input[type="number"]');
+    inputs.on("input", (event) => {
+      const input = event.currentTarget;
+      const name = input.name;
+      const value = input.value;
+      // Sync slider and input
+      const otherInput = $html.find(`[name="${name}"]`).not(input);
+      otherInput.val(value);
+      this._updatePreview();
+      // Restart animation
+      if (name === "textSpeed") {
+        this._startPreviewAnimation();
+      }
+    });
   }
 
-  async close(options) {
+  _onClose(options) {
     this._onDragEnd();
     if (this._previewElements) {
       this._previewElements.window.remove();
@@ -290,40 +329,10 @@ class LayoutSettingsDialog extends FormApplication {
       clearTimeout(this._animationTimeout);
       this._animationTimeout = null;
     }
-    return super.close(options);
+    super._onClose(options);
   }
 
-  activateListeners(html) {
-    super.activateListeners(html);
-    // GUI Toggle Button
-    html.find('[data-action="toggle-gui"]').on("click", (event) => {
-      event.preventDefault();
-      this._isGuiMode = !this._isGuiMode;
-      this._updateGuiModeVisuals();
-    });
-    // Reset Button
-    html
-      .find('[data-action="reset-settings"]')
-      .on("click", this._onResetSettings.bind(this));
-    // Input listener
-    const inputs = html.find('input[type="range"], input[type="number"]');
-    inputs.on("input", (event) => {
-      const input = event.currentTarget;
-      const name = input.name;
-      const value = input.value;
-      // Sync slider and input
-      const otherInput = html.find(`[name="${name}"]`).not(input);
-      otherInput.val(value);
-      this._updatePreview();
-      // Restart animation
-      if (name === "textSpeed") {
-        this._startPreviewAnimation();
-      }
-    });
-  }
-
-  async _updateObject(event, formData) {
-    const form = this.element[0].querySelector("form");
+  static async #onSubmit(event, form, formData) {
     const settingKeys = [
       "windowHPosition",
       "windowVPosition",
@@ -350,7 +359,7 @@ class LayoutSettingsDialog extends FormApplication {
   _updateGuiModeVisuals() {
     if (!this._previewElements) return;
     const { window, portrait } = this._previewElements;
-    const button = this.element.find('[data-action="toggle-gui"]');
+    const button = $(this.element).find('[data-action="toggle-gui"]');
     const icon = button.find("i");
     if (this._isGuiMode) {
       window.classList.add("gui-active");
@@ -369,7 +378,7 @@ class LayoutSettingsDialog extends FormApplication {
 
   _updatePreview() {
     if (!this._previewElements) return;
-    const form = this.element[0].querySelector("form");
+    const form = this.element;
     if (!form) return;
 
     const data = {};
@@ -454,7 +463,7 @@ class LayoutSettingsDialog extends FormApplication {
   }
 
   _animateText(element, text, onComplete) {
-    const form = this.element[0].querySelector("form");
+    const form = this.element;
     const speedValue = form.querySelector('[name="textSpeed"]')?.value ?? 100;
     const speed = 80 / (parseFloat(speedValue) / 100);
     element.innerHTML = "";
@@ -499,7 +508,7 @@ class LayoutSettingsDialog extends FormApplication {
     const board = document.getElementById("board");
     const sidebar = document.getElementById("sidebar");
     const overlayWidth = board.offsetWidth - sidebar.offsetWidth;
-    const form = this.element[0].querySelector("form");
+    const form = this.element;
 
     this._dragData = {
       action: action,
@@ -540,7 +549,7 @@ class LayoutSettingsDialog extends FormApplication {
 
     const dx = event.clientX - this._dragData.startX;
     const dy = event.clientY - this._dragData.startY;
-    const form = this.element[0].querySelector("form");
+    const form = this.element;
 
     const { action, initial, overlayWidth } = this._dragData;
 
@@ -588,9 +597,10 @@ class LayoutSettingsDialog extends FormApplication {
     document.removeEventListener("mousemove", this._onDragMove);
     document.removeEventListener("mouseup", this._onDragEnd);
   }
+
   async _onResetSettings(event) {
     event.preventDefault();
-    const form = this.element[0].querySelector("form");
+    const form = this.element;
 
     const settingsToReset = [
       "windowHPosition",
@@ -618,7 +628,6 @@ class LayoutSettingsDialog extends FormApplication {
 }
 
 // MCTSettingsDialog class
-const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 export class MCTSettingsDialog extends HandlebarsApplicationMixin(
   ApplicationV2
 ) {
