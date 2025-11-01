@@ -89,82 +89,80 @@ function adjustOverlaySize() {
 
   const board = document.getElementById("board");
   const sidebar = document.getElementById("sidebar");
+  const baseWidth =
+    board && board.offsetWidth > 0 ? board.offsetWidth : globalThis.innerWidth;
+  const sidebarWidth = sidebar ? sidebar.offsetWidth : 0;
+  const overlayWidth = baseWidth - sidebarWidth;
 
-  if (board && sidebar && chatOverlay) {
-    const boardWidth = board.offsetWidth;
-    const sidebarWidth = sidebar.offsetWidth;
-    const overlayWidth = boardWidth - sidebarWidth;
+  // window transparent
+  let transparent =
+    game.settings.get("simple-message-window", "transparent") ?? 10;
+  const windowTransparent = (100 - transparent) / 100;
+  chatOverlay.style.setProperty(
+    "background-color",
+    `rgba(0, 0, 0, ${windowTransparent})`
+  );
+  chatOverlay.style.setProperty(
+    "color",
+    `rgba(255, 255, 255, ${windowTransparent})`
+  );
 
-    // window transparent
-    let transparent =
-      game.settings.get("simple-message-window", "transparent") ?? 10;
-    const windowTransparent = (100 - transparent) / 100;
-    chatOverlay.style.setProperty(
-      "background-color",
-      `rgba(0, 0, 0, ${windowTransparent})`
-    );
-    chatOverlay.style.setProperty(
-      "color",
-      `rgba(255, 255, 255, ${windowTransparent})`
-    );
+  // image transparent
+  let imgtransparent =
+    game.settings.get("simple-message-window", "imgTransparent") ?? 10;
+  const imageTransparent = (100 - imgtransparent) / 100;
+  const imgOverlay = document.querySelector("#smw-portrait-overlay img");
+  imgOverlay.style.opacity = `${imageTransparent}`;
 
-    // image transparent
-    let imgtransparent =
-      game.settings.get("simple-message-window", "imgTransparent") ?? 10;
-    const imageTransparent = (100 - imgtransparent) / 100;
-    const imgOverlay = document.querySelector("#smw-portrait-overlay img");
-    imgOverlay.style.opacity = `${imageTransparent}`;
+  // window position
+  let windowVPositionSetting =
+    game.settings.get("simple-message-window", "windowVPosition") ?? 5;
+  chatOverlay.style.bottom = `${windowVPositionSetting}%`;
+  let windowHPositionSetting =
+    game.settings.get("simple-message-window", "windowHPosition") ?? 50;
+  const chatLeft = (overlayWidth / 100) * windowHPositionSetting;
+  chatOverlay.style.left = `${chatLeft}px`;
 
-    // window position
-    let windowVPositionSetting =
-      game.settings.get("simple-message-window", "windowVPosition") ?? 5;
-    chatOverlay.style.bottom = `${windowVPositionSetting}%`;
-    let windowHPositionSetting =
-      game.settings.get("simple-message-window", "windowHPosition") ?? 50;
-    const chatLeft = (overlayWidth / 100) * windowHPositionSetting;
-    chatOverlay.style.left = `${chatLeft}px`;
+  // window size
+  let windowWidthSetting =
+    game.settings.get("simple-message-window", "windowWidth") ?? 100;
+  let windowHeightSetting =
+    game.settings.get("simple-message-window", "windowHeight") ?? 100;
+  const chatWidth = (overlayWidth * 0.7 * windowWidthSetting) / 100;
+  const chatHeight = (overlayWidth * 0.15 * windowHeightSetting) / 100;
+  const chatBottom =
+    parseFloat(window.getComputedStyle(chatOverlay).bottom) || 0;
 
-    // window size
-    let windowWidthSetting =
-      game.settings.get("simple-message-window", "windowWidth") ?? 100;
-    let windowHeightSetting =
-      game.settings.get("simple-message-window", "windowHeight") ?? 100;
-    const chatWidth = (overlayWidth * 0.7 * windowWidthSetting) / 100;
-    const chatHeight = (overlayWidth * 0.15 * windowHeightSetting) / 100;
-    const chatBottom =
-      parseFloat(window.getComputedStyle(chatOverlay).bottom) || 0;
+  chatOverlay.style.width = `${chatWidth}px`;
+  chatOverlay.style.height = `${chatHeight}px`;
 
-    chatOverlay.style.width = `${chatWidth}px`;
-    chatOverlay.style.height = `${chatHeight}px`;
-
-    const overlayHeight = chatOverlay.offsetHeight;
-    const headerHeight =
-      chatOverlay.querySelector(".smw-header")?.offsetHeight || 0;
-    const messageElement = chatOverlay.querySelector(".smw-message");
-    if (messageElement) {
-      const contentHeight = overlayHeight - headerHeight - 20;
-      messageElement.style.maxHeight = `${contentHeight}px`;
-    }
-
-    // font size
-    let fontSizeSetting =
-      game.settings.get("simple-message-window", "fontSize") ?? 100;
-    const fontSize = (1.2 * fontSizeSetting) / 100;
-    chatOverlay.style.setProperty("font-size", `${fontSize}em`);
-
-    // portrait size
-    let imgSizeSetting =
-      game.settings.get("simple-message-window", "imgSize") ?? 100;
-    const portraitHeigt = (chatHeight * imgSizeSetting) / 100;
-    const portraitWidth = (chatHeight * imgSizeSetting) / 100;
-    const portraitLeft = chatLeft - chatWidth / 2 + portraitWidth / 2 + 10;
-    const portraitBottom = chatBottom + chatHeight;
-
-    portraitOverlay.style.height = `${portraitHeigt}px`;
-    portraitOverlay.style.width = `${portraitWidth}px`;
-    portraitOverlay.style.left = `${portraitLeft}px`;
-    portraitOverlay.style.bottom = `${portraitBottom}px`;
+  const overlayHeight = chatOverlay.offsetHeight;
+  const headerHeight =
+    chatOverlay.querySelector(".smw-header")?.offsetHeight || 0;
+  const messageElement = chatOverlay.querySelector(".smw-message");
+  if (messageElement) {
+    const contentHeight = overlayHeight - headerHeight - 20;
+    messageElement.style.maxHeight = `${contentHeight}px`;
   }
+
+  // font size
+  let fontSizeSetting =
+    game.settings.get("simple-message-window", "fontSize") ?? 100;
+  const fontSize = (1.2 * fontSizeSetting) / 100;
+  chatOverlay.style.setProperty("font-size", `${fontSize}em`);
+
+  // portrait size
+  let imgSizeSetting =
+    game.settings.get("simple-message-window", "imgSize") ?? 100;
+  const portraitHeigt = (chatHeight * imgSizeSetting) / 100;
+  const portraitWidth = (chatHeight * imgSizeSetting) / 100;
+  const portraitLeft = chatLeft - chatWidth / 2 + portraitWidth / 2 + 10;
+  const portraitBottom = chatBottom + chatHeight;
+
+  portraitOverlay.style.height = `${portraitHeigt}px`;
+  portraitOverlay.style.width = `${portraitWidth}px`;
+  portraitOverlay.style.left = `${portraitLeft}px`;
+  portraitOverlay.style.bottom = `${portraitBottom}px`;
 }
 
 function showCheck(message) {
