@@ -403,9 +403,12 @@ class LayoutSettingsDialog extends HandlebarsApplicationMixin(ApplicationV2) {
     const { window, portrait } = this._previewElements;
     const board = document.getElementById("board");
     const sidebar = document.getElementById("sidebar");
-    if (!board || !sidebar) return;
-
-    const overlayWidth = board.offsetWidth - sidebar.offsetWidth;
+    const baseWidth =
+      board && board.offsetWidth > 0
+        ? board.offsetWidth
+        : globalThis.innerWidth;
+    const sidebarWidth = sidebar ? sidebar.offsetWidth : 0;
+    const overlayWidth = baseWidth - sidebarWidth;
 
     // Window opacity
     const windowTransparent = (100 - data.transparent) / 100;
@@ -505,9 +508,12 @@ class LayoutSettingsDialog extends HandlebarsApplicationMixin(ApplicationV2) {
     event.stopPropagation();
 
     const { window, portrait } = this._previewElements;
-    const board = document.getElementById("board");
-    const sidebar = document.getElementById("sidebar");
-    const overlayWidth = board.offsetWidth - sidebar.offsetWidth;
+    const baseWidth =
+      board && board.offsetWidth > 0
+        ? board.offsetWidth
+        : globalThis.innerWidth;
+    const sidebarWidth = sidebar ? sidebar.offsetWidth : 0;
+    const overlayWidth = baseWidth - sidebarWidth;
     const form = this.element;
 
     this._dragData = {
