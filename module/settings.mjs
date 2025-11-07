@@ -13,9 +13,9 @@ export class SMWSettings {
       name: game.i18n.localize("SETTING.layoutMenu.name"),
       label: game.i18n.localize("SETTING.layoutMenu.label"),
       hint: game.i18n.localize("SETTING.layoutMenu.hint"),
+      scope: "client",
       icon: "fas fa-ruler-combined",
       type: LayoutSettingsDialog,
-      restricted: true,
     });
     game.settings.register("simple-message-window", "showCharacter", {
       name: game.i18n.localize("SETTING.showCharacter.name"),
@@ -68,7 +68,7 @@ export class SMWSettings {
     game.settings.register("simple-message-window", "transparent", {
       name: game.i18n.localize("SETTING.transparent.name"),
       hint: game.i18n.localize("SETTING.transparent.hint"),
-      scope: "world",
+      scope: "client",
       config: false,
       type: Number,
       default: 10,
@@ -140,7 +140,7 @@ export class SMWSettings {
     game.settings.register("simple-message-window", "imgTransparent", {
       name: game.i18n.localize("SETTING.imgTransparent.name"),
       hint: game.i18n.localize("SETTING.imgTransparent.hint"),
-      scope: "world",
+      scope: "client",
       config: false,
       type: Number,
       default: 10,
@@ -155,7 +155,7 @@ export class SMWSettings {
     });
     if (game.modules.get("multiple-chat-tabs")?.active) {
       game.settings.register("simple-message-window", "mctDisplayTabs", {
-        scope: "client",
+        scope: "world",
         config: false,
         type: Array,
         default: undefined,
@@ -164,6 +164,7 @@ export class SMWSettings {
         name: game.i18n.localize("SETTING.mct.name"),
         label: game.i18n.localize("SETTING.mct.label"),
         hint: game.i18n.localize("SETTING.mct.hint"),
+        scope: "world",
         icon: "fas fa-comments",
         type: MCTSettingsDialog,
         restricted: true,

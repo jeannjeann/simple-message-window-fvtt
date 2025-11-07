@@ -47,6 +47,9 @@ In 'Install Module' window of Foundry VTT's 'Add-on Modules', paste the above 'M
 
 # CHANGELOG
 
+## 2.1.1 & 1.3.1
+- bug fix
+
 ## 2.1.0 & 1.3.0
 - Add integration with “Multiple Chat Tabs” module
 - Add GUI-based layout adjustment function
